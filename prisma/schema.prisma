@@ -1,0 +1,188 @@
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Organization {
+    id                String    @id @default(auto()) @map("_id") @db.ObjectId
+    name              String    @unique
+    website           String?
+    logo              String?
+    headOfficeAddress String?
+    isBroker          Boolean   @default(false)
+    user              User[]
+    createdAt         DateTime? @default(now())
+}
+
+model User {
+    id                             String                           @id @default(auto()) @map("_id") @db.ObjectId
+    email                          String                           @unique
+    phone                          String                           @unique
+    firstName                      String
+    lastName                       String
+    fullName                       String?
+    position                       String?
+    location                       String?
+    grade                          String?
+    department                     String?
+    organizationId                 String?                          @db.ObjectId
+    organization                   Organization?                    @relation(fields: [organizationId], references: [id])
+    managerId                      String?                          @db.ObjectId
+    managedBy                      User?                            @relation("UserManager", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    createdById                    String?                          @db.ObjectId
+    createdBy                      User?                            @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    createdAt                      DateTime?                        @default(now())
+    subordinates                   User[]                           @relation("UserManager")
+    authersubordinates             User[]                           @relation("UserCreatedBy")
+    activity_source                Activity_source[]
+    activit_category               Activity_category[]
+    activit_type                   Activity_type[]
+    project                        Project[]
+    activity_unit_type             Activity_unit_type[]
+    activity_lead_status           Activity_lead_status[]
+    activity_not_interested_reason Activity_not_interested_reason[]
+    activity                       Activity[]                       @relation("ActivityCreatedBy")
+    salesPerson                    Activity[]                       @relation("salesPerson")
+    salesBroker                    Activity[]                       @relation("salesBroker")
+}
+
+model Activity_source {
+    id          String     @id @default(auto()) @map("_id") @db.ObjectId
+    name        String     @unique
+    createdById String     @db.ObjectId
+    createdBy   User       @relation(fields: [createdById], references: [id])
+    createdAt   DateTime?  @default(now())
+    activity    Activity[]
+}
+
+model Activity_category {
+    id          String     @id @default(auto()) @map("_id") @db.ObjectId
+    name        String     @unique
+    createdById String     @db.ObjectId
+    createdBy   User       @relation(fields: [createdById], references: [id])
+    createdAt   DateTime?  @default(now())
+    activity    Activity[]
+}
+
+model Activity_type {
+    id          String     @id @default(auto()) @map("_id") @db.ObjectId
+    name        String     @unique
+    createdById String     @db.ObjectId
+    createdBy   User       @relation(fields: [createdById], references: [id])
+    createdAt   DateTime?  @default(now())
+    activity    Activity[]
+}
+
+model Project {
+    id          String     @id @default(auto()) @map("_id") @db.ObjectId
+    name        String     @unique
+    createdById String     @db.ObjectId
+    createdBy   User       @relation(fields: [createdById], references: [id])
+    createdAt   DateTime?  @default(now())
+    activity    Activity[]
+}
+
+model Activity_unit_type {
+    id          String     @id @default(auto()) @map("_id") @db.ObjectId
+    name        String     @unique
+    createdById String     @db.ObjectId
+    createdBy   User       @relation(fields: [createdById], references: [id])
+    createdAt   DateTime?  @default(now())
+    activity    Activity[]
+}
+
+model Activity_lead_status {
+    id          String     @id @default(auto()) @map("_id") @db.ObjectId
+    name        String     @unique
+    createdById String     @db.ObjectId
+    createdBy   User       @relation(fields: [createdById], references: [id])
+    createdAt   DateTime?  @default(now())
+    activity    Activity[]
+}
+
+model Activity_not_interested_reason {
+    id          String     @id @default(auto()) @map("_id") @db.ObjectId
+    name        String     @unique
+    createdById String     @db.ObjectId
+    createdBy   User       @relation(fields: [createdById], references: [id])
+    createdAt   DateTime?  @default(now())
+    activity    Activity[]
+}
+
+model Activity {
+    id          String @id @default(auto()) @map("_id") @db.ObjectId
+    createdById String @db.ObjectId
+
+    createdAt DateTime? @default(now())
+
+    activityTitle String @unique
+    activityDate  DateTime? @default(now())
+    salesPersonId String    @db.ObjectId
+    // createdBy   User      @relation(fields: [createdById], references: [id])
+    createdBy     User?     @relation("ActivityCreatedBy", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    salesPerson   User?     @relation("salesPerson", fields: [salesPersonId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    // salesPerson   User      @relation(fields: [ salesPersonId], references: [id])
+
+    activitySourceId String          @db.ObjectId
+    activitySource   Activity_source @relation(fields: [activitySourceId], references: [id])
+
+    activityCategoryId String            @db.ObjectId
+    activityCategory   Activity_category @relation(fields: [activityCategoryId], references: [id])
+
+    activityTypeId String        @db.ObjectId
+    activityType   Activity_type @relation(fields: [activityTypeId], references: [id])
+
+    projectId String  @db.ObjectId
+    project   Project @relation(fields: [projectId], references: [id])
+
+    activityUnitTypeId String             @db.ObjectId
+    activityUnitType   Activity_unit_type @relation(fields: [activityUnitTypeId], references: [id])
+
+    activityLeadStatusId String               @db.ObjectId
+    activityLeadStatus   Activity_lead_status @relation(fields: [activityLeadStatusId], references: [id])
+
+    activityNotInterestedReasonId String                         @db.ObjectId
+    activityNotInterestedReason   Activity_not_interested_reason @relation(fields: [activityNotInterestedReasonId], references: [id])
+
+    clientName String?
+
+    salesBrokerId String @db.ObjectId
+
+    salesBroker User? @relation("salesBroker", fields: [salesBrokerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+    budget         Float?
+    contact        String?
+    compatetior    String?
+    leadBrokerage  Boolean? @default(false)
+    agentBrokerage Boolean? @default(false)
+    Remarks        String?
+}
+
+// model Post {
+//   id       String    @id @default(auto()) @map("_id") @db.ObjectId
+//   slug     String    @unique
+//   title    String
+//   body     String
+//   author   User      @relation(fields: [authorId], references: [id])
+//   authorId String    @db.ObjectId
+//   comments Comment[]
+// }
+
+// model Comment {
+//   id      String @id @default(auto()) @map("_id") @db.ObjectId
+//   comment String
+//   post    Post   @relation(fields: [postId], references: [id])
+//   postId  String @db.ObjectId
+// }
+
+// Address is an embedded document
+// type Address {
+//   street String
+//   city   String
+//   state  String
+//   zip    String
+// }
