@@ -1,8 +1,8 @@
-
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Appslider from "@/components/appSlider";
 import {
   Breadcrumb,
@@ -22,145 +22,146 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { BellIcon, LogOutIcon } from "lucide-react";
+import { ActivityIcon, BellIcon, HomeIcon, LogOutIcon } from "lucide-react";
+import Link from "next/link";
 
-const navData = [
-  {
-    title: "Getting Started",
-    url: "#",
-    items: [
-      {
-        title: "Installation",
-        url: "#",
-      },
-      {
-        title: "Project Structure",
-        url: "#",
-      },
-    ],
-  },
-  {
-    title: "Building Your Application",
-    url: "#",
-    items: [
-      {
-        title: "Routing",
-        url: "#",
-      },
-      {
-        title: "Data Fetching",
-        url: "#",
-        isActive: true,
-      },
-      {
-        title: "Rendering",
-        url: "#",
-      },
-      {
-        title: "Caching",
-        url: "#",
-      },
-      {
-        title: "Styling",
-        url: "#",
-      },
-      {
-        title: "Optimizing",
-        url: "#",
-      },
-      {
-        title: "Configuring",
-        url: "#",
-      },
-      {
-        title: "Testing",
-        url: "#",
-      },
-      {
-        title: "Authentication",
-        url: "#",
-      },
-      {
-        title: "Deploying",
-        url: "#",
-      },
-      {
-        title: "Upgrading",
-        url: "#",
-      },
-      {
-        title: "Examples",
-        url: "#",
-      },
-    ],
-  },
-  // {
-  //   title: "API Reference",
-  //   url: "#",
-  //   items: [
-  //     {
-  //       title: "Components",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "File Conventions",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "Functions",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "next.config.js Options",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "CLI",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "Edge Runtime",
-  //       url: "#",
-  //     },
-  //   ],
-  // },
-  // {
-  //   title: "Architecture",
-  //   url: "#",
-  //   items: [
-  //     {
-  //       title: "Accessibility",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "Fast Refresh",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "Next.js Compiler",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "Supported Browsers",
-  //       url: "#",
-  //     },
-  //     {
-  //       title: "Turbopack",
-  //       url: "#",
-  //     },
-  //   ],
-  // },
-  // {
-  //   title: "Community",
-  //   url: "#",
-  //   items: [
-  //     {
-  //       title: "Contribution Guide",
-  //       url: "#",
-  //     },
-  //   ],
-  // },
-];
+// const navData = [
+//   {
+//     title: "Getting Started",
+//     url: "#",
+//     items: [
+//       {
+//         title: "Installation",
+//         url: "#",
+//       },
+//       {
+//         title: "Project Structure",
+//         url: "#",
+//       },
+//     ],
+//   },
+//   {
+//     title: "Building Your Application",
+//     url: "#",
+//     items: [
+//       {
+//         title: "Routing",
+//         url: "#",
+//       },
+//       {
+//         title: "Data Fetching",
+//         url: "#",
+//         isActive: true,
+//       },
+//       {
+//         title: "Rendering",
+//         url: "#",
+//       },
+//       {
+//         title: "Caching",
+//         url: "#",
+//       },
+//       {
+//         title: "Styling",
+//         url: "#",
+//       },
+//       {
+//         title: "Optimizing",
+//         url: "#",
+//       },
+//       {
+//         title: "Configuring",
+//         url: "#",
+//       },
+//       {
+//         title: "Testing",
+//         url: "#",
+//       },
+//       {
+//         title: "Authentication",
+//         url: "#",
+//       },
+//       {
+//         title: "Deploying",
+//         url: "#",
+//       },
+//       {
+//         title: "Upgrading",
+//         url: "#",
+//       },
+//       {
+//         title: "Examples",
+//         url: "#",
+//       },
+//     ],
+//   },
+// {
+//   title: "API Reference",
+//   url: "#",
+//   items: [
+//     {
+//       title: "Components",
+//       url: "#",
+//     },
+//     {
+//       title: "File Conventions",
+//       url: "#",
+//     },
+//     {
+//       title: "Functions",
+//       url: "#",
+//     },
+//     {
+//       title: "next.config.js Options",
+//       url: "#",
+//     },
+//     {
+//       title: "CLI",
+//       url: "#",
+//     },
+//     {
+//       title: "Edge Runtime",
+//       url: "#",
+//     },
+//   ],
+// },
+// {
+//   title: "Architecture",
+//   url: "#",
+//   items: [
+//     {
+//       title: "Accessibility",
+//       url: "#",
+//     },
+//     {
+//       title: "Fast Refresh",
+//       url: "#",
+//     },
+//     {
+//       title: "Next.js Compiler",
+//       url: "#",
+//     },
+//     {
+//       title: "Supported Browsers",
+//       url: "#",
+//     },
+//     {
+//       title: "Turbopack",
+//       url: "#",
+//     },
+//   ],
+// },
+// {
+//   title: "Community",
+//   url: "#",
+//   items: [
+//     {
+//       title: "Contribution Guide",
+//       url: "#",
+//     },
+//   ],
+// },
+// ];
 
 export default function ProtectedLayout({
   children,
@@ -169,15 +170,109 @@ export default function ProtectedLayout({
 }) {
   const { status } = useSession();
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, } = useSession();
   const logout = async () => {
     await signOut();
   };
+
+  const [navData, setNavData] = useState<
+    {
+      title: string;
+      url: string;
+      icon?: React.ReactNode;
+      items?: { title: string; url: string;  icon?: React.ReactNode; isActive?: boolean }[];
+    }[]
+  >([
+    {
+      title: "Home",
+      url: "/",
+      icon: <HomeIcon />,
+   
+    },
+    {
+      title: "Getting Started",
+      url: "#",
+      items: [
+        {
+          title: "Activities",
+          url: "/activities",
+          icon: <ActivityIcon />,
+        },
+        {
+          title: "Project Structure",
+          url: "#",
+        },
+      ],
+    }
+  ]);
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
-  }, [status, router]);
+
+   if( session?.user && navData.length === 2 ){setNavData([
+
+      ...navData,
+      
+      {
+        title: "Building Your Application",
+        url: "#",
+        items: [
+          {
+            title: 
+           session?.user?.name || "Routing",
+            url: "#",
+          },
+          {
+            title: "Data Fetching",
+            url: "#",
+            isActive: true,
+          },
+          {
+            title: "Rendering",
+            url: "#",
+          },
+          {
+            title: "Caching",
+            url: "#",
+          },
+          {
+            title: "Styling",
+            url: "#",
+          },
+          {
+            title: "Optimizing",
+            url: "#",
+          },
+          {
+            title: "Configuring",
+            url: "#",
+          },
+          {
+            title: "Testing",
+            url: "#",
+          },
+          {
+            title: "Authentication",
+            url: "#",
+          },
+          {
+            title: "Deploying",
+            url: "#",
+          },
+          {
+            title: "Upgrading",
+            url: "#",
+          },
+          {
+            title: "Examples",
+            url: "#",
+          },
+        ],
+      }
+    ]) 
+  }
+  }, [session]);
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -198,24 +293,18 @@ export default function ProtectedLayout({
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem>
-                       <BreadcrumbLink href="#">Data Fetching</BreadcrumbLink>
+                    <BreadcrumbLink href="#">Data Fetching</BreadcrumbLink>
                   </BreadcrumbItem>
 
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem className="hidden md:block float-end">
-                
-
                     <BreadcrumbPage>Page</BreadcrumbPage>
-
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
             }
             rightSidebar={
               <div className="flex justify-center items-center gap-2 p-4">
-            
-
-                
                 <Button
                   data-sidebar="logout"
                   data-slot="sidebar-logout"
@@ -262,16 +351,16 @@ export default function ProtectedLayout({
             appSidebar={navData.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
-                  <a href={item.url} className="font-medium">
-                    {item.title}
-                  </a>
+                  <Link href={item.url} className="font-medium">{item.icon && item.icon} {item.title}</Link>
+                  
                 </SidebarMenuButton>
                 {item.items?.length ? (
                   <SidebarMenuSub>
                     {item.items.map((item) => (
                       <SidebarMenuSubItem key={item.title}>
                         <SidebarMenuSubButton asChild isActive={item.isActive}>
-                          <a href={item.url}>{item.title}</a>
+                     
+                          <Link href={item.url}>{item.icon && item.icon}  {item.title}</Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
@@ -281,21 +370,22 @@ export default function ProtectedLayout({
             ))}
           >
             <div className="flex flex-1 flex-col gap-4 p-4">
-              <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+              {/* <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                 <div className="aspect-video rounded-xl bg-muted/50" />
                 <div className="aspect-video rounded-xl bg-muted/50" />
                 <div className="aspect-video rounded-xl bg-muted/50" />
-              </div>
+              </div> */}
               <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
                 <div>
-                  <p>Logged inddd as:</p>
+                  {/* <p>Logged inddd as:</p>
                   <p>
                     <strong>Name:</strong> {session.user?.name}
                   </p>
                   <p>
                     <strong>Email:</strong> {session.user?.email}
                   </p>
-                  <button onClick={logout}>Logout</button>
+                  <button onClick={logout}>Logout</button> */}
+                     {children}
                 </div>
               </div>
             </div>
@@ -304,7 +394,7 @@ export default function ProtectedLayout({
              {JSON.stringify(session, null, 2)}
            </pre> */}
 
-            {children}
+         
           </Appslider>
         )}
 
