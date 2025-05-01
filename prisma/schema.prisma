@@ -48,6 +48,17 @@ model User {
     activity                       Activity[]                       @relation("ActivityCreatedBy")
     salesPerson                    Activity[]                       @relation("salesPerson")
     salesBroker                    Activity[]                       @relation("salesBroker")
+    userAuth                     UserAuth[]                   
+}
+
+
+model UserAuth {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    userName   String   @unique
+    password String
+    userId   String @db.ObjectId @unique
+    createdAt DateTime? @default(now())
+    user     User @relation(fields: [userId], references: [id])
 }
 
 model Activity_source {

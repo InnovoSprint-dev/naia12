@@ -36,6 +36,16 @@ async function main() {
     },
   });
 
+  await prisma.userAuth.upsert({
+    where: { userId: superAdmin.id },
+    update: {},
+    create: {
+      userId: superAdmin.id,
+      userName: "superadmin",
+      password: "12345678",
+    },
+  });
+
   const safty = await prisma.user.upsert({
     where: { email: "amr.safty@naiadevelopments.com" },
     update: {},
@@ -172,7 +182,7 @@ async function main() {
       },
     });
 
- await prisma.activity.upsert({
+  await prisma.activity.upsert({
     where: { activityTitle: "My first activity" },
     update: {},
     create: {
