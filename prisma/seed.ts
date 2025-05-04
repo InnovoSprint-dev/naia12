@@ -132,6 +132,30 @@ async function main() {
       createdById: safty.id,
     },
   });
+
+
+
+
+  await prisma.activity_source.upsert({
+    where: { name: "Indirect" },
+    update: {},
+    create: {
+      name: "Indirect",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_source.upsert({
+    where: { name: "Personal data" },
+    update: {},
+    create: {
+      name: "Personal data",
+      createdById: safty.id,
+    },
+  });
+
+
   const Activity_category = await prisma.activity_category.upsert({
     where: { name: "Client Activity" },
     update: {},
@@ -140,6 +164,29 @@ async function main() {
       createdById: safty.id,
     },
   });
+
+  await prisma.activity_category.upsert({
+    where: { name: "Broker Activity" },
+    update: {},
+    create: {
+      name: "Broker Activity",
+      createdById: safty.id,
+    },
+  });
+
+  await prisma.activity_category.upsert({
+    where: { name: "Internal task" },
+    update: {},
+    create: {
+      name: "Internal task",
+      createdById: safty.id,
+    },
+  });
+
+
+
+
+
   const Activity_type = await prisma.activity_type.upsert({
     where: { name: "Existing Client Call" },
     update: {},
@@ -148,6 +195,119 @@ async function main() {
       createdById: safty.id,
     },
   });
+
+
+
+  await prisma.activity_type.upsert({
+    where: { name: "Cold call" },
+    update: {},
+    create: {
+      name: "Cold call",
+      createdById: safty.id,
+    },
+  });
+
+
+
+  await prisma.activity_type.upsert({
+    where: { name: "Qualifying leads" },
+    update: {},
+    create: {
+      name: "Qualifying leads",
+      createdById: safty.id,
+    },
+  });
+
+  await prisma.activity_type.upsert({
+    where: { name: "Follow-up call" },
+    update: {},
+    create: {
+      name: "Follow-up call",
+      createdById: safty.id,
+    },
+  });
+
+  await prisma.activity_type.upsert({
+    where: { name: "Client meeting (In office)" },
+    update: {},
+    create: {
+      name: "Client meeting (In office)",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_type.upsert({
+    where: { name: "Client meeting (Out side)" },
+    update: {},
+    create: {
+      name: "Client meeting (Out side)",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_type.upsert({
+    where: { name: "WhatsApp follow-up" },
+    update: {},
+    create: {
+      name: "WhatsApp follow-up",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_type.upsert({
+    where: { name: "Email follow-up" },
+    update: {},
+    create: {
+      name: "Email follow-up",
+      createdById: safty.id,
+    },
+  });
+
+  await prisma.activity_type.upsert({
+    where: { name: "Online meeting" },
+    update: {},
+    create: {
+      name: "Online meeting",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_type.upsert({
+    where: { name: "Site visit" },
+    update: {},
+    create: {
+      name: "Site visit",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_type.upsert({
+    where: { name: "Sending offer" },
+    update: {},
+    create: {
+      name: "Sending offer",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_type.upsert({
+    where: { name: "Sending brochures or price list" },
+    update: {},
+    create: {
+      name: "Sending brochures or price list",
+      createdById: safty.id,
+    },
+  });
+
+
+
+
   const Project = await prisma.project.upsert({
     where: { name: "Naia Bay" },
     update: {},
@@ -156,6 +316,20 @@ async function main() {
       createdById: safty.id,
     },
   });
+
+  
+
+ await prisma.project.upsert({
+    where: { name: "Naia West" },
+    update: {},
+    create: {
+      name: "Naia West",
+      createdById: safty.id,
+    },
+  });
+
+
+
   const Activity_unit_type = await prisma.activity_unit_type.upsert({
     where: { name: "1 Bedroom" },
     update: {},
@@ -164,6 +338,59 @@ async function main() {
       createdById: safty.id,
     },
   });
+
+
+  await prisma.activity_unit_type.upsert({
+    where: { name: "2 Bedroom" },
+    update: {},
+    create: {
+      name: "2 Bedroom",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_unit_type.upsert({
+    where: { name: "3 Bedroom" },
+    update: {},
+    create: {
+      name: "3 Bedroom",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_unit_type.upsert({
+    where: { name: "TownHouse" },
+    update: {},
+    create: {
+      name: "TownHouse",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_unit_type.upsert({
+    where: { name: "TwinHouse" },
+    update: {},
+    create: {
+      name: "TwinHouse",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_unit_type.upsert({
+    where: { name: "StandAlone" },
+    update: {},
+    create: {
+      name: "StandAlone",
+      createdById: safty.id,
+    },
+  });
+
+
+
   const Activity_lead_status = await prisma.activity_lead_status.upsert({
     where: { name: "Negotiating" },
     update: {},
@@ -172,6 +399,58 @@ async function main() {
       createdById: safty.id,
     },
   });
+
+  await prisma.activity_lead_status.upsert({
+    where: { name: "Interested" },
+    update: {},
+    create: {
+      name: "Interested",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_lead_status.upsert({
+    where: { name: "Not interested" },
+    update: {},
+    create: {
+      name: "Not interested",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_lead_status.upsert({
+    where: { name: "Nees follow-up" },
+    update: {},
+    create: {
+      name: "Nees follow-up",
+      createdById: safty.id,
+    },
+  });
+
+
+  await prisma.activity_lead_status.upsert({
+    where: { name: "Reserved" },
+    update: {},
+    create: {
+      name: "Reserved",
+      createdById: safty.id,
+    },
+  });
+
+  await prisma.activity_lead_status.upsert({
+    where: { name: "Contracted" },
+    update: {},
+    create: {
+      name: "Contracted",
+      createdById: safty.id,
+    },
+  });
+
+
+
+
   const Activity_not_interested_reason =
     await prisma.activity_not_interested_reason.upsert({
       where: { name: "Budget" },
@@ -181,6 +460,36 @@ async function main() {
         createdById: safty.id,
       },
     });
+
+
+
+    await prisma.activity_not_interested_reason.upsert({
+      where: { name: "Unit availability" },
+      update: {},
+      create: {
+        name: "Unit availability",
+        createdById: safty.id,
+      },
+    });
+
+    await prisma.activity_not_interested_reason.upsert({
+      where: { name: "Distenation" },
+      update: {},
+      create: {
+        name: "Distenation",
+        createdById: safty.id,
+      },
+    });
+
+    await prisma.activity_not_interested_reason.upsert({
+      where: { name: "Unit type" },
+      update: {},
+      create: {
+        name: "Unit type",
+        createdById: safty.id,
+      },
+    });
+
 
   await prisma.activity.upsert({
     where: { activityTitle: "My first activity" },
