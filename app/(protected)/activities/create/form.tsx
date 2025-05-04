@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
+// import {  useSession } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useState } from "react";
-
+import { addDays, format } from "date-fns";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +16,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-
-import { Check, ChevronsUpDown } from "lucide-react";
-
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import {
@@ -37,8 +43,11 @@ import {
 } from "@/components/ui/popover";
 
 const FormSchema = z.object({
-  title: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  activityDate: z.string().min(1, {
+    message: "Activity date is required.",
+  }),
+  activityTitle: z.string().min(2, {
+    message: "Activity title must be at least 2 characters.",
   }),
   project: z.string().min(2, {
     message: "Project is required.",
@@ -59,23 +68,19 @@ const FormSchema = z.object({
     message: "lead status is required.",
   }),
   activityNotInterestedReason: z.string().optional(),
-
-
-
   
-clientName: z.string().min(2, {
+  clientName: z.string().min(2, {
     message: "Client name must be at least 2 characters.",
   }),
-budget: z.string().optional(),
-contact: z.string().optional(),
-compatetior: z.string().optional(),
-Remarks: z.string().optional(),
-
-
-
+  budget: z.string().optional(),
+  contact: z.string().optional(),
+  compatetior: z.string().optional(),
+  Remarks: z.string().optional(),
 });
 
 export default function InputForm({dataSource}: {dataSource: any}) {
+  // const { data: session, } = useSession();
+  // const [date, setDate] = useState<Date>()
   // Create a separate open state for each dropdown
   const [openStates, setOpenStates] = useState({
     project: false,
@@ -101,7 +106,8 @@ export default function InputForm({dataSource}: {dataSource: any}) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      title: "",
+      activityTitle: "",
+      activityDate: "",
       project: "",
       activitySource: "",
       activityCategory: "",
@@ -110,10 +116,10 @@ export default function InputForm({dataSource}: {dataSource: any}) {
       activityLeadStatus: "",
       activityNotInterestedReason: "",
       clientName: "",
-budget: "",
-contact: "",
-compatetior: "",
-Remarks: "",
+      budget: "",
+      contact: "",
+      compatetior: "",
+      Remarks: "",
     },
   });
   
@@ -134,6 +140,63 @@ Remarks: "",
   };
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    try {
+      // Map form field names to API expected field names
+      const apiSubmitData = {
+        activityTitle: data.activityTitle,
+        activityDate: data.activityDate,
+        salesPersonId: "clr2b8dge000kuygqgq2u9ty3", // Default value since salesPerson field isn't in form 
+        activitySourceId: data.activitySource,
+        activityCategoryId: data.activityCategory,
+        activityTypeId: data.activityType,
+        projectId: data.project,
+        activityUnitTypeId: data.activityUnitType,
+        activityLeadStatusId: data.activityLeadStatus,
+        activityNotInterestedReasonId: data.activityNotInterestedReason || undefined,
+        clientName: data.clientName,
+        salesBrokerId: "clr2b8dge000kuygqgq2u9ty3", // Default value since salesBroker field isn't in form
+        budget: data.budget ? parseFloat(data.budget) : null, // Convert budget to number or null
+        contact: data.contact || "",
+        compatetior: data.compatetior || "",
+        leadBrokerage: false, // Default values for missing fields
+        agentBrokerage: false,
+        Remarks: data.Remarks || ""
+      };
+
+      fetch("/api/activities/create", {
+        method: "POST", 
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apiSubmitData),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Success:", data);
+        toast("Activity created successfully!", {
+          description: "Your activity has been created.",
+        });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        toast("Failed to create activity", {
+          description: "There was an error creating your activity.",
+          // variant: "destructive",
+        });
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      toast("Error", {
+        description: "There was an error processing your request.",
+        // variant: "destructive",
+      });
+    }
+
     toast("Form submitted", {
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
@@ -151,10 +214,12 @@ Remarks: "",
   const SelectField = ({ 
     name, 
     label, 
+    required,
     data 
   }: { 
     name: keyof typeof values, 
     label: string, 
+    required?: boolean,
     data: Array<{ id: string, name: string }> 
   }) => {
     return (
@@ -163,7 +228,7 @@ Remarks: "",
         name={name}
         render={({ field }) => (
           <FormItem className="grid grid-cols-2 gap-0 items-center">
-            <FormLabel className="justify-start items-center">{label}</FormLabel>
+            <FormLabel className="justify-start items-center">{label} {required && <span className="text-red-500 mx-0 font-black text-sm">*</span>}</FormLabel>
             <FormControl>
               <Popover 
                 open={openStates[name]} 
@@ -235,6 +300,7 @@ Remarks: "",
           
             name="project" 
             label="Project" 
+            required={true}
             data={dataSource.project || []} 
           />
           
@@ -247,54 +313,124 @@ Remarks: "",
           <SelectField 
             name="activityCategory" 
             label="Category" 
+            required={true}
             data={dataSource.activityCategory || []} 
           />
           
           <SelectField 
             name="activityType" 
             label="Type" 
+            required={true}
             data={dataSource.activityType || []} 
           />
           
           <SelectField 
             name="activityUnitType" 
             label="Unit Type" 
+            required={true}
             data={dataSource.activityUnitType || []} 
           />
           
           <SelectField 
             name="activityLeadStatus" 
             label="Lead Status" 
+            required={true}
             data={dataSource.activityLeadStatus || []} 
           />
           
           <SelectField 
             name="activityNotInterestedReason" 
             label="Not Interested Reason" 
+   
             data={dataSource.activityNotInterestedReason || []} 
           />
 
+
+
+
+<FormField
+  control={form.control}
+  name="activityDate"
+  render={({ field }) => (
+    <FormItem className="grid grid-cols-2 gap-0 items-center">
+      <FormLabel>Activity Date <span className="text-red-500 mx-0 font-black text-sm">*</span></FormLabel>
+      <FormControl>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !field.value && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {field.value ? format(new Date(field.value), "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+            <Select
+              onValueChange={(value) => {
+                const newDate = addDays(new Date(), parseInt(value));
+                field.onChange(format(newDate, "yyyy-MM-dd"));
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectItem value="0">Today</SelectItem>
+                <SelectItem value="1">Tomorrow</SelectItem>
+                <SelectItem value="3">In 3 days</SelectItem>
+                <SelectItem value="7">In a week</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="rounded-md border">
+              <Calendar 
+                mode="single" 
+                selected={field.value ? new Date(field.value) : undefined} 
+                onSelect={(date) => {
+                  if (date) {
+                    field.onChange(format(date, "yyyy-MM-dd"));
+                  }
+                }} 
+              />
+            </div>
+          </PopoverContent>
+        </Popover>
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
+
 <FormField
             control={form.control}
-            name="title"
+            name="activityTitle"
             render={({ field }) => (
               <FormItem className="grid grid-cols-2 gap-0 items-center">
-                <FormLabel>Activity Title</FormLabel>
+                <FormLabel>Activity Title  <span className="text-red-500 mx-0 font-black text-sm">*</span></FormLabel>
                 <FormControl>
-                  <Input placeholder="shadcn" {...field} />
+                  <Input placeholder="Insert title" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           /> 
+
+
+
+
+
           <FormField
           control={form.control}
           name="clientName"
           render={({ field }) => (
             <FormItem className="grid grid-cols-2 gap-0 items-center">
-              <FormLabel>Client name</FormLabel>
+              <FormLabel>Client name  <span className="text-red-500 mx-0 font-black text-sm">*</span></FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Insert client name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -306,7 +442,7 @@ Remarks: "",
         <FormItem className="grid grid-cols-2 gap-0 items-center">
           <FormLabel>Budget</FormLabel>
           <FormControl>
-            <Input type="number" placeholder="shadcn" {...field} />
+            <Input type="number" placeholder="Insert budget" {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -320,7 +456,7 @@ Remarks: "",
           <FormItem className="grid grid-cols-2 gap-0 items-center">
             <FormLabel>Contact</FormLabel>
             <FormControl>
-              <Input placeholder="shadcn" {...field} />
+              <Input placeholder="Insert contact" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -333,7 +469,7 @@ Remarks: "",
                 <FormItem className="grid grid-cols-2 gap-0 items-center">
                   <FormLabel>Compatetior</FormLabel>
                   <FormControl>
-                    <Input placeholder="shadcn" {...field} />
+                    <Input placeholder="Insert competitor" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -346,7 +482,7 @@ Remarks: "",
                       <FormItem className="grid grid-cols-2 gap-0 items-center">
                         <FormLabel>Remarks</FormLabel>
                         <FormControl>
-                          <Input placeholder="shadcn" {...field} />
+                          <Input placeholder="Add remarks" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

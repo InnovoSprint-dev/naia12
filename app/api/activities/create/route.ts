@@ -1,123 +1,127 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextResponse } from 'next/server';
-import  prisma  from '@/lib/prisma'
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import prisma from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
 
+export async function POST(request: NextRequest) {
+  try {
+    // Get the current user's session using the exported authOptions
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: "Unauthorized: You must be logged in to create an activity" },
+        { status: 401 }
+      );
+    }
 
+    // Get user from database to use as creator
+    const user = await prisma.user.findUnique({
+      where: {
+        email: session.user.email as string,
+      },
+    });
 
-export async function GET(request: Request) {
- 
-    try{
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found in database" },
+        { status: 404 }
+      );
+    }
 
-         const data: any = {
-    salesPerson: [],
-     activitySource: [],
-     activityCategory: [],
-     activityType: [],
-     project: [],
-     activityUnitType: [],
-     activityLeadStatus: [],
-     activityNotInterestedReason: [],
-     salesBroker: [],
-     activity: []
+    // Parse request body
+    const data = await request.json();
+    
+    // Create the activity with properly typed budget
+    const budget = typeof data.budget === 'string' 
+      ? parseFloat(data.budget) 
+      : (typeof data.budget === 'number' ? data.budget : null);
+    
+    // Debug what's received from the client
+    console.log("Received data:", data);
+    
+    // If salesBrokerId is missing, use the salesPersonId as a fallback
+    // This ensures we always have a valid broker ID according to the schema
+    const salesBrokerId = data.salesBrokerId || data.salesPersonId;
+    
+    // Check required fields
+    if (!data.activityTitle || !data.salesPersonId || !data.activitySourceId || 
+        !data.activityCategoryId || !data.activityTypeId || !data.projectId || 
+        !data.activityUnitTypeId || !data.activityLeadStatusId || !salesBrokerId) {
+      return NextResponse.json(
+        { error: "Missing required fields", 
+          received: {
+            title: !!data.activityTitle,
+            salesPerson: !!data.salesPersonId,
+            salesBroker: !!salesBrokerId,
+            source: !!data.activitySourceId,
+            category: !!data.activityCategoryId,
+            type: !!data.activityTypeId,
+            project: !!data.projectId,
+            unitType: !!data.activityUnitTypeId,
+            leadStatus: !!data.activityLeadStatusId,
+          }
+        },
+        { status: 400 }
+      );
+    }
+
+    const activity = await prisma.activity.create({
+      data: {
+        activityTitle: data.activityTitle,
+        activityDate: new Date(data.activityDate), // Ensure this is a proper Date object
+        createdById: user.id,
+        
+        // Required relations with proper ID types
+        salesPersonId: data.salesPersonId,
+        salesBrokerId: salesBrokerId, // Use our fallback value if needed
+        activitySourceId: data.activitySourceId,
+        activityCategoryId: data.activityCategoryId,
+        activityTypeId: data.activityTypeId,
+        projectId: data.projectId,
+        activityUnitTypeId: data.activityUnitTypeId,
+        activityLeadStatusId: data.activityLeadStatusId,
+        
+        // Optional fields
+        clientName: data.clientName || null,
+        budget: budget,
+        contact: data.contact || null,
+        compatetior: data.compatetior || null,
+        leadBrokerage: data.leadBrokerage || false,
+        agentBrokerage: data.agentBrokerage || false,
+        Remarks: data.Remarks || null,
+        
+        // Optional relation - only include if it exists
+        ...(data.activityNotInterestedReasonId ? { 
+          activityNotInterestedReasonId: data.activityNotInterestedReasonId 
+        } : {})
+      },
+    });
+
+    return NextResponse.json(
+      { 
+        message: "Activity created successfully", 
+        activity 
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error creating activity:", error);
+    
+    // Handle unique constraint violation
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
+      return NextResponse.json(
+        { error: "An activity with this title already exists" },
+        { status: 409 }
+      );
+    }
+    
+    return NextResponse.json(
+      { 
+        error: "An error occurred while creating the activity",
+        message: error instanceof Error ? error.message : "Unknown error" 
+      },
+      { status: 500 }
+    );
   }
-
-        data.salesPerson = await prisma.user.findMany({
-            select: {
-                id: true,
-                fullName: true,
-                managedBy: { select: { id: true, fullName: true, managedBy: {select: {id:true, fullName:true}} } }
-            }   
-        })
-         data.activitySource = await prisma.activity_source.findMany({
-            select: {
-                id: true,
-                name: true
-            }
-        })
-         data.activityCategory = await prisma.activity_category.findMany({
-            select: {
-                id: true,
-                name: true
-            }
-        })
-         data.activityType = await prisma.activity_type.findMany({
-            select: {
-                id: true,
-                name: true
-            }
-        })
-         data.project = await prisma.project.findMany({
-            select: {
-                id: true,
-                name: true
-            }
-        })
-         data.activityUnitType = await prisma.activity_unit_type.findMany({
-            select: {
-                id: true,
-                name: true
-            }
-        })
-         data.activityLeadStatus = await prisma.activity_lead_status.findMany({
-            select: {
-                id: true,
-                name: true
-            }
-        })
-         data.activityNotInterestedReason = await prisma.activity_not_interested_reason.findMany({
-            select: {
-                id: true,
-                name: true
-            }
-        })
-         data.salesBroker = await prisma.user.findMany({
-            where: {
-                organization : {isBroker: true}
-            },
-            select: {
-                id: true,
-                fullName: true
-            }
-        })
-
-         data.activity = await prisma.activity.findMany({
-            select: {
-                activityTitle: true,
-            }
-        })
-       
-        return NextResponse.json(data)
-         
-    // const activites = await prisma.activity.findMany({
-    //     select: {
-    //         id: true,
-    //         createdBy: { select: { id: true, fullName: true } },
-    //         createdAt: true,
-    //         activityTitle: true,
-    //         activityDate: true,
-    //         salesPerson: { select: { id: true, fullName: true, managedBy: { select: { id: true, fullName: true, managedBy: {select: {id:true, fullName:true}} } } } },
-    //         activitySource: { select: { id: true, name: true } },
-    //         activityCategory: { select: { id: true, name: true } },
-    //         activityType: { select: { id: true, name: true } },
-    //         project: { select: { id: true, name: true } },
-    //         activityUnitType: { select: { id: true, name: true } },
-    //         activityLeadStatus: { select: { id: true, name: true } },
-    //         activityNotInterestedReason: { select: { id: true, name: true } },
-    //         clientName: true,
-    //         salesBroker: { select: { id: true, fullName: true } },
-    //         budget: true,
-    //         contact: true,
-    //         compatetior: true,
-    //         leadBrokerage: true,
-    //         agentBrokerage: true,
-    //         Remarks: true
-    //     }
-    // })
-    // return NextResponse.json(activites)
-    }catch (error) {
-        console.error("Error fetching activities:", error)
-        return NextResponse.json({ error: "Failed to fetch activities" }, { status: 500 })      
-    }
-   
-    }
+}

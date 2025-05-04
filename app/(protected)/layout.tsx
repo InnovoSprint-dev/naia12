@@ -22,7 +22,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { ActivityIcon, BellIcon, HomeIcon, LogOutIcon } from "lucide-react";
+import { ActivityIcon, ArrowUpFromDotIcon, BellIcon, BoxesIcon, HandshakeIcon, HomeIcon, LogOutIcon, SquaresIntersectIcon } from "lucide-react";
 import Link from "next/link";
 
 // const navData = [
@@ -199,9 +199,26 @@ export default function ProtectedLayout({
           icon: <ActivityIcon />,
         },
         {
-          title: "Project Structure",
-          url: "#",
+          title: "Lead status",
+          url: "/leadStatus",
+          icon: <HandshakeIcon />,
+        }, {
+          title: "Lead source",
+          url: "/leadSource",
+          icon: <ArrowUpFromDotIcon />,
         },
+        {
+          title: "Lead category",
+          url: "/leadCategory",
+          icon: <BoxesIcon />,
+        },   {
+          title: "Lead type",
+          url: "/leadType",
+          icon: <SquaresIntersectIcon />,
+        },
+
+        
+        
       ],
     }
   ]);
@@ -215,59 +232,16 @@ export default function ProtectedLayout({
       ...navData,
       
       {
-        title: "Building Your Application",
+        title: "Pipeline",
         url: "#",
         items: [
+        
           {
-            title: 
-           session?.user?.name || "Routing",
-            url: "#",
-          },
-          {
-            title: "Data Fetching",
+            title: "List",
             url: "#",
             isActive: true,
           },
-          {
-            title: "Rendering",
-            url: "#",
-          },
-          {
-            title: "Caching",
-            url: "#",
-          },
-          {
-            title: "Styling",
-            url: "#",
-          },
-          {
-            title: "Optimizing",
-            url: "#",
-          },
-          {
-            title: "Configuring",
-            url: "#",
-          },
-          {
-            title: "Testing",
-            url: "#",
-          },
-          {
-            title: "Authentication",
-            url: "#",
-          },
-          {
-            title: "Deploying",
-            url: "#",
-          },
-          {
-            title: "Upgrading",
-            url: "#",
-          },
-          {
-            title: "Examples",
-            url: "#",
-          },
+         
         ],
       }
     ]) 

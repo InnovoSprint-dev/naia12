@@ -63,7 +63,8 @@ export default function ComboboxDemo({data, title, updatedValue}:{data: any, tit
   return (
     <div className="grid grid-cols-2 justify-center items-center gap-2">
         <Label className="text-sm font-medium text-slate-700 mb-2 items-center  justify-end" htmlFor="frameworks">
-        {title}
+          
+        {title}fdf
         </Label>
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

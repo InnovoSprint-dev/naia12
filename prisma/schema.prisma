@@ -156,12 +156,12 @@ model Activity {
     activityLeadStatusId String               @db.ObjectId
     activityLeadStatus   Activity_lead_status @relation(fields: [activityLeadStatusId], references: [id])
 
-    activityNotInterestedReasonId String                         @db.ObjectId
-    activityNotInterestedReason   Activity_not_interested_reason @relation(fields: [activityNotInterestedReasonId], references: [id])
+    activityNotInterestedReasonId String?                        @db.ObjectId
+    activityNotInterestedReason   Activity_not_interested_reason? @relation(fields: [activityNotInterestedReasonId], references: [id])
 
     clientName String?
 
-    salesBrokerId String @db.ObjectId
+    salesBrokerId String? @db.ObjectId
 
     salesBroker User? @relation("salesBroker", fields: [salesBrokerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
